@@ -9,12 +9,22 @@ import math
 
 SOURCE_PAHT = os.path.join(os.getcwd(), "source_file")
 FILE_PATH = os.path.join(os.getcwd(), "files")
-DEFAULT_SPLIT_CAPACITY = "100m"
+# DEFAULT_SPLIT_CAPACITY = "100m"
 DEFAULT_SUFFIX = "wewe_"
 ZIP_FILES = os.path.join(os.getcwd(), "zip_files")
 # 得到最大的文件 单位：G
-SPLIT_FILE_SIZE = 10
-SMALL_FIEL_SIZE = 105
+SPLIT_FILE_SIZE = 0.1
+# 每个生成文件的大小
+SMALL_FIEL_SIZE = 10
+# 每块文件分多少份
+SOLIT_SMALLE_FLIE_SIZE = 10
+DEFAULT_SPLIT_CAPACITY = str(SOLIT_SMALLE_FLIE_SIZE) + "m"
+
+
+def getrandSplitNum(file_name):
+    num = getFileOrDirsSize(file_name) / SOLIT_SMALLE_FLIE_SIZE / 2
+
+    return math.floor(num)
 
 
 # 生成文件的操作
@@ -112,10 +122,10 @@ def zipFiles(file_list):
 
 
 # 组合新的结构
-def createBigDirs():
+def createBigDirs(file_num):
     file_list = getSplitFileList()
     choice_list = []
-    max_file_num = random.randint(1, 5)
+    max_file_num = random.randint(1, file_num)
     while True:
         choice_list.append(random.choice(file_list))
         if len(choice_list) >= max_file_num:
@@ -137,12 +147,10 @@ def mainController(exist_file="", ):
         exist_file = os.path.join(SOURCE_PAHT, exist_file)
     # 分割
     splitFile(exist_file)
-    # file_size = SPLIT_FILE_SIZE / 10
-    # file_size = math.ceil(file_size)
-    # print(file_size)
     threads = []
+    num = getrandSplitNum(exist_file)
     for i in range(10):
-        t = threading.Thread(target=createBigDirs, args=())
+        t = threading.Thread(target=createBigDirs, args=(num, ))
         threads.append(t)
         t.start()
     for t in threads:
@@ -153,7 +161,7 @@ def mainController(exist_file="", ):
 if __name__ == "__main__":
     start = timeit.default_timer()
     # 这里可以添加 exist_file 文件。。 请放到source_file，只需要文件名称就可以了。。 
-    mainController("628266.zip")
+    mainController("631200.zip")
 
     end = timeit.default_timer()
     print(str(end - start))
